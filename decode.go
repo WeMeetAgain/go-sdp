@@ -7,8 +7,8 @@ import (
     )
 
 const (
-    badChar = "bad character found"
-    badGrammar = "bad grammar found"
+    badChar string = "bad character found"
+    badGrammar string = "bad grammar found"
     )
 
 func Decode(str string) (SessionDescription, error) {
@@ -111,7 +111,7 @@ func Decode(str string) (SessionDescription, error) {
                 fallthrough
             }
         case 12: // Attribute
-            if line[0] == 'k' {
+            if line[0] == 'a' {
                 sd.Attribute = parseAttribute(line[2:])
             } else {
                 state++
@@ -126,26 +126,32 @@ func Decode(str string) (SessionDescription, error) {
             }
         case 14: // Information
             if line[0] == 'i' {
-                sd.MediaDescriptions[(len(sd.Times)-1)].Info = parseInformation(line[2:])
+                sd.MediaDescriptions[(len(sd.MediaDescriptions)-1)].Info = parseInformation(line[2:])
             } else {
                 state++
                 fallthrough
             }
         case 15: // Connection
             if line[0] == 'c' {
-                sd.MediaDescriptions[(len(sd.Times)-1)].Connection = parseConnection(line[2:])
+                sd.MediaDescriptions[(len(sd.MediaDescriptions)-1)].Connection = parseConnection(line[2:])
             } else {
                 state++
                 fallthrough
             }
         case 16: // Bandwidth
             if line[0] == 'i' {
-                sd.MediaDescriptions[(len(sd.Times)-1)].Bandwidths = append(sd.MediaDescriptions[(len(sd.Times)-1)].Bandwidths, parseBandwidth(line[2:]))
+                sd.MediaDescriptions[(len(sd.MediaDescriptions)-1)].Bandwidths = append(sd.MediaDescriptions[(len(sd.Times)-1)].Bandwidths, parseBandwidth(line[2:]))
             } else {
                 state++
                 fallthrough
             }
         case 17: // Attribute
+            if line[0] == 'm' {
+                sd.MediaDescriptions[(len(sd.MediaDescriptions)-1)].Attributes = parseAttribute(line[2:])
+            } else {
+                state++
+                fallthrough
+            }
         }
     }
 }

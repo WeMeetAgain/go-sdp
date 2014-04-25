@@ -1,5 +1,12 @@
 package sdp
 
+const (
+    MediaTypes []string = ["audio", "video", "text", "application", "message"]
+    TransportTypes []string = ["udp", "RTP/AVP", "RTP/SAVP"]
+    AttrTypes []string = ["cat", "keywds", "tool", "ptime", "maxptime", "rtpmap", "orient", "type", "charset", "framerate", "quality", "fmtp", "recvonly", "sendrecv", "sendonly", "inactive", "sdplang", "lang"]
+    KeyTypes []string = ["prompt", "clear", "base64", "uri"]
+    )
+
 type SessionDescription struct {
     Version           int
     Origin            Origin
@@ -65,16 +72,14 @@ type Zone struct {
 }
 
 type MediaDescription struct {
-    MediaField
+    Type string
+    Port int
+    NumPorts int
+    Proto string
+    Fmt string
     Information
     []Connection
     []Bandwidth
     Key
     Attributes map[string]string
-}
-
-type MediaField struct {
-    Type string
-    Port int
-    Proto string
 }

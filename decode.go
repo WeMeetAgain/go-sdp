@@ -29,7 +29,11 @@ func Decode(str string) (SessionDescription, error) {
             }
         case 1: // Origin
             if line[0] == 'o' {
-                sd.Origin = parseOrigin(line[2:])
+                if o, err := parseOrigin(line[2:]); err == nil {
+                    sd.Origin = o
+                } else {
+                    return nil, err
+                }
                 state++
             } else {
                 return nil, errors.New(badChar)
@@ -59,7 +63,11 @@ func Decode(str string) (SessionDescription, error) {
             }
         case 5: // Email
             if line[0] == 'e' {
-                sd.Emails = append(sd.Emails, parseEmail(line[2:]))
+                if e, err := parseEmail(line[2:]); err == nil {
+                    sd.Emails = append(sd.Emails, e)
+                } else {
+                    return nil, err
+                }
                 state++
             } else {
                 state++
@@ -67,7 +75,11 @@ func Decode(str string) (SessionDescription, error) {
             }
         case 6: // Phone
             if line[0] == 'p' {
-                sd.Phones = append(sd.Phones, parsePhone(line[2:]))
+                if p, err := parsePhone(line[2:]); err == nil {
+                    sd.Phones = append(sd.Phones, p)
+                } else {
+                    return nil, err
+                }
                 state++
             } else {
                 state++
@@ -75,7 +87,11 @@ func Decode(str string) (SessionDescription, error) {
             }
         case 7: // Connection
             if line[0] == 'c' {
-                sd.Connection = parseConnection(line[2:])
+                if c, err := parseConnection(line[2:]); err == nil {
+                    sd.Connection = c
+                } else {
+                    return nil, err
+                }
                 state++
             } else {
                 state++
@@ -83,28 +99,44 @@ func Decode(str string) (SessionDescription, error) {
             }
         case 8: // Time
             if line[0] == 't' {
-                sd.Times = append(sd.Times,parseTime(line[2:]))
+                if t, err := parseTime(line[2:]); err == nil {
+                    sd.Times = append(sd.Times, t)
+                } else {
+                    return nil, err
+                }
             } else {
                 state++
                 fallthrough
             }
         case 9: // Repeat Times
             if line[0] == 'r' {
-                sd.Times[(len(sd.Times)-1)] = parseRepeat(line[2:])
+                if r, err := parseRepeat(line[2:]); err == nil {
+                    sd.Times[(len(sd.Times)-1)] = r
+                } else {
+                    return nil, err
+                }
             } else {
                 state++
                 fallthrough
             }
         case 10: // Zone Adjustments
             if line[0] == 'z' {
-                sd.Times[(len(sd.Times)-1)] = parseRepeat(line[2:])
+                if z, err := parseZone(line[2:]); err == nil {
+                    sd.Times[(len(sd.Times)-1)] = z
+                } else {
+                    return nil, err
+                }
             } else {
                 state++
                 fallthrough
             }
         case 11: // Key
             if line[0] == 'k' {
-                sd.Key = parseKey(line[2:])
+                if k, err := parseZone(line[2:]); err == nil {
+                    sd.Key = k
+                } else {
+                    return nil, err
+                }
                 state++
             } else {
                 state++
@@ -112,42 +144,66 @@ func Decode(str string) (SessionDescription, error) {
             }
         case 12: // Attribute
             if line[0] == 'a' {
-                sd.Attribute = parseAttribute(line[2:])
+                if a, err := parseAttribute(line[2:]); err == nil {
+                    sd.Attribute = a
+                } else {
+                    return nil, err
+                }
             } else {
                 state++
                 fallthrough
             }
         case 13: // Media Description
             if line[0] == 'm' {
-                sd.MediaDescriptions = append(sd.MediaDescriptions, parseAttribute(line[2:]))
+                if m, err := parseMedia(line[2:]); err == nil {
+                    sd.MediaDescriptions = append(sd.MediaDescriptions, m)
+                } else {
+                    return nil, err
+                }
             } else {
                 state++
                 fallthrough
             }
         case 14: // Information
             if line[0] == 'i' {
-                sd.MediaDescriptions[(len(sd.MediaDescriptions)-1)].Info = parseInformation(line[2:])
+                if i, err := parseInformation(line[2:]; err == nil {
+                    sd.MediaDescriptions[(len(sd.MediaDescriptions)-1)].Info = i)
+                } else {
+                    return nil, err
+                }
             } else {
                 state++
                 fallthrough
             }
         case 15: // Connection
             if line[0] == 'c' {
-                sd.MediaDescriptions[(len(sd.MediaDescriptions)-1)].Connection = parseConnection(line[2:])
+                if c, err := parseConnection(line[2:]); err == nil {
+                    sd.MediaDescriptions[(len(sd.MediaDescriptions)-1)].Connection = c
+                } else {
+                    return nil, err
+                }
             } else {
                 state++
                 fallthrough
             }
         case 16: // Bandwidth
-            if line[0] == 'i' {
-                sd.MediaDescriptions[(len(sd.MediaDescriptions)-1)].Bandwidths = append(sd.MediaDescriptions[(len(sd.Times)-1)].Bandwidths, parseBandwidth(line[2:]))
+            if line[0] == 'b' {
+                if b, err := parseBandwidth(line[2:]); err == nil {
+                    sd.MediaDescriptions[(len(sd.MediaDescriptions)-1)].Bandwidths = append(sd.MediaDescriptions[(len(sd.Times)-1)].Bandwidths, b)
+                } else {
+                    return nil, err
+                }
             } else {
                 state++
                 fallthrough
             }
         case 17: // Attribute
-            if line[0] == 'm' {
-                sd.MediaDescriptions[(len(sd.MediaDescriptions)-1)].Attributes = parseAttribute(line[2:])
+            if line[0] == 'a' {
+                if a, b, err := parseAttribute(line[2:]); err == nil {
+                    sd.MediaDescriptions[(len(sd.MediaDescriptions)-1)].Attributes[a] = b
+                } else {
+                    return nil, err
+                }
             } else {
                 state++
                 fallthrough
@@ -156,9 +212,14 @@ func Decode(str string) (SessionDescription, error) {
     }
 }
 
+func contains(s []string, e string) bool {
+    for _, a := range s { if a == e { return true } }
+    return false
+}
+
 func parseOrigin(s string) (Origin, error) {
     tokens := strings.Split(s," ")
-    if tokens) != 6 {
+    if len(tokens) != 6 {
         return nil, errors.New(badGrammar)
     }
     return Origin{
@@ -238,7 +299,7 @@ func parsePhone(s string) (Phone, error) {
 
 func parseConnection(s string) (Connection, error) {
     tokens := strings.Split(s," ")
-    if tokens) != 3 {
+    if len(tokens) != 3 {
         return nil, errors.New(badGrammar)
     }
     return Connection{
@@ -246,4 +307,71 @@ func parseConnection(s string) (Connection, error) {
         tokens[1]
         tokens[2]
     }, nil
+}
+
+func parseTime(s string) (TimeField, error) {
+    
+}
+
+func parseRepeat(s string) (Repeat, error) {
+    
+}
+
+func parseZone(s string) (Zone, error) {
+    
+}
+
+func parseKey(s string) (Key, error) {
+    tokens := strings.Split(s,":")
+    if !contains(KeyTypes, tokens[0]) {
+        return nil, errors.New(badGrammar)
+    }
+    if len(tokens) == 1 {
+        return tKey{tokens[0], ""}, nil
+    } else if len(tokens) == 2 {
+        return Key{tokens[0], tokens[1]}, nil
+    } else
+        return nil, errors.New(badGrammar)
+    }
+}
+
+func parseAttribute(s string) (string, string, error) {
+    tokens := strings.Split(s,":")
+    if !contains(AttrTypes, tokens[0]) {
+        return "", "", errors.New(badGrammar)
+    }
+    if len(tokens) == 1 {
+        return tokens[0], "", nil
+    } else if len(tokens) == 2 {
+        return tokens[0], tokens[1], nil
+    } else
+        return "", "", errors.New(badGrammar)
+    }
+}
+
+func parseMedia(s string) (MediaDescription, error) {
+    tokens := strings.Split(s," ")
+    m := MediaDescription{}
+    if len(tokens) != 4 {
+        return nil, errors.New(badGrammar)
+    }
+    if !contains(MediaTypes, tokens[0]) {
+        return nil, errors.New(badGrammar)
+    }
+    if p := strings.Split(tokens[1],"/"); len(p) > 2 || len(p) < 1 {
+        return nil, errors.New(badGrammar)
+    } else if len(p) == 2 {
+        m.NumPorts = p[1]
+        m.Port = p[0]
+    } else {
+        m.Port = p[0]
+    }
+    if !contains(ProtoTypes, tokens[2]) {
+        return nil, errors.New(badGrammar)
+    }
+    m.Type = tokens[0]
+    m.Proto = tokens[2]
+    m.Fmt = tokens[3]
+    return m, nil
+}
 }

@@ -33,7 +33,7 @@ func Decode(str string) (SessionDescription, error) {
 var DefaultRules = []func(*SDPParser,string) error{versionLine, originLine, sessionNameLine, infoLine, uriLine, emailLine, phoneLine, connectionLine, timeLine, repeatLine, zoneLine, keyLine, attrLine, mediaLine, mediaInfoLine, mediaConnectionLine, mediaBandwidthLine, mediaAttrLine}
 
 func NewSDPParser() *SDPParser {
-    return &SDPParser{SessionDescription{},DefaultRules,0}
+    return &SDPParser{SessionDescription{Attributes: make(map[string]string)},DefaultRules,0}
 }
 
 func (p *SDPParser) Next(s string) error {
@@ -362,8 +362,8 @@ func parseEmail(s string) (Email, error) {
         if bracket1, bracket2 := strings.Index(s,"<"), strings.Index(s,">"); bracket1 != -1 && bracket2 != -1 {
             if (bracket1-2) > -1 {
                 return Email{
-                    Address: s[(bracket1+1):(bracket2-1)],
-                    Name: s[0:(bracket1-2)],
+                    Address: s[(bracket1+1):(bracket2)],
+                    Name: s[0:(bracket1)],
                 }, nil
             } else {
                 return Email{}, errors.New(badGrammar)
@@ -374,8 +374,8 @@ func parseEmail(s string) (Email, error) {
         if paren1, paren2 := strings.Index(s,"("), strings.Index(s,")"); paren1 != -1 && paren2 != -1 {
             if (paren1-2) > -1 {
                 return Email{
-                    Address: s[0:(paren1-2)],
-                    Name: s[(paren1+1):(paren2-1)],
+                    Address: s[0:(paren1-1)],
+                    Name: s[(paren1+1):(paren2)],
                 }, nil
             } else {
                 return Email{}, errors.New(badGrammar)
@@ -391,8 +391,8 @@ func parsePhone(s string) (Phone, error) {
     if bracket1, bracket2 := strings.Index(s,"<"), strings.Index(s,">"); bracket1 != -1 && bracket2 != -1 {
         if (bracket1-2) > -1 {
             return Phone{
-                Address: s[(bracket1+1):(bracket2-1)],
-                Name: s[0:(bracket1-2)],
+                Address: s[(bracket1+1):(bracket2)],
+                Name: s[0:(bracket1)],
             }, nil
         } else {
             return Phone{}, errors.New(badGrammar)
@@ -403,8 +403,8 @@ func parsePhone(s string) (Phone, error) {
     if paren1, paren2 := strings.Index(s,"("), strings.Index(s,")"); paren1 != -1 && paren2 != -1 {
         if (paren1-2) > -1 {
             return Phone{
-                Address: s[0:(paren1-2)],
-                Name: s[(paren1+1):(paren2-1)],
+                Address: s[0:(paren1-1)],
+                Name: s[(paren1+1):(paren2)],
             }, nil
         } else {
             return Phone{}, errors.New(badGrammar)
@@ -572,7 +572,7 @@ func parseAttribute(s string) (string, string, error) {
 
 func parseMedia(s string) (MediaDescription, error) {
     tokens := strings.Split(s," ")
-    m := MediaDescription{}
+    m := MediaDescription{Attributes: make(map[string]string)}
     if len(tokens) != 4 {
         return MediaDescription{}, errors.New(badGrammar)
     }
@@ -597,7 +597,7 @@ func parseMedia(s string) (MediaDescription, error) {
         if err != nil {
             return m, err
         }
-        m.NumPorts = int(p)
+        m.Port = int(p)
     }
     if !contains(TransportTypes, tokens[2]) {
         return m, errors.New(badGrammar)

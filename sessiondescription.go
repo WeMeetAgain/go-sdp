@@ -1,10 +1,14 @@
 package sdp
 
-const (
-    MediaTypes []string = ["audio", "video", "text", "application", "message"]
-    TransportTypes []string = ["udp", "RTP/AVP", "RTP/SAVP"]
-    AttrTypes []string = ["cat", "keywds", "tool", "ptime", "maxptime", "rtpmap", "orient", "type", "charset", "framerate", "quality", "fmtp", "recvonly", "sendrecv", "sendonly", "inactive", "sdplang", "lang"]
-    KeyTypes []string = ["prompt", "clear", "base64", "uri"]
+import (
+    "time"
+    )
+
+var (
+    MediaTypes = []string{"audio", "video", "text", "application", "message"}
+    TransportTypes =  []string{"udp", "RTP/AVP", "RTP/SAVP"}
+    AttrTypes = []string{"cat", "keywds", "tool", "ptime", "maxptime", "rtpmap", "orient", "type", "charset", "framerate", "quality", "fmtp", "recvonly", "sendrecv", "sendonly", "inactive", "sdplang", "lang"}
+    KeyTypes = []string{"prompt", "clear", "base64", "uri"}
     )
 
 type SessionDescription struct {
@@ -17,7 +21,7 @@ type SessionDescription struct {
     Phones            []Phone
     Connection        Connection
     Bandwidths        []Bandwidth
-    Times             []TimeField
+    Times             []TimeDescription
     Key               Key
     Attributes        map[string]string
     MediaDescriptions []MediaDescription
@@ -53,33 +57,38 @@ type Bandwidth struct {
     Bandwidth string
 }
 
-type SessionTime struct {
-    Start time.*Time
-    Stop time.*Time
+type TimeDescription struct {
+    Start time.Time
+    Stop time.Time
     Repeats []Repeat
     Zones []Zone
 }
 
 type Repeat struct {
-    Interval time.*Duration
-    Active time.*Duration
-    Offsets []time.*Time
+    Interval time.Duration
+    Active   time.Duration
+    Offsets  []time.Duration
 }
 
 type Zone struct {
-    Time Time
-    TypedTime
+    Time   time.Time
+    Offset time.Duration
+}
+
+type Key struct {
+    Method string
+    Key    string
 }
 
 type MediaDescription struct {
-    Type string
-    Port int
-    NumPorts int
-    Proto string
-    Fmt string
-    Information
-    []Connection
-    []Bandwidth
-    Key
-    Attributes map[string]string
+    Type        string
+    Port        int
+    NumPorts    int
+    Proto       string
+    Fmt         string
+    Info        string
+    Connections []Connection
+    Bandwidths  []Bandwidth
+    Key         Key
+    Attributes  map[string]string
 }

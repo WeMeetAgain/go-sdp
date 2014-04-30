@@ -27,6 +27,19 @@ type SessionDescription struct {
     MediaDescriptions []MediaDescription
 }
 
+func NewSessionDescription() *SessionDescription {
+    return &SessionDescription{
+        Version: 0,
+        Attributes: make(map[string]string),
+    }
+}
+
+func NewMediaDescription() *MediaDescription {
+    return &MediaDescription{
+      Attributes: make(map[string]string),
+    }
+}  
+
 type Origin struct {
     Username       string
     SessionId      string

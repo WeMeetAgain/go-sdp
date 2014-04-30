@@ -8,7 +8,7 @@ import (
 func (sd *SessionDescription) Encode() (string, error) {
     str := ""
     // Version
-    str += "v=" + string(sd.Version) + "\n"
+    str += "v=" + strconv.FormatInt(int64(sd.Version),10) + "\n"
     // Origin
     str += "o=" + sd.Origin.String()  + "\n"
     // Session Name
@@ -81,7 +81,7 @@ func (c *Connection) String() string {
 }
 
 func (b *Bandwidth) String() string {
-    return "b=" + b.Type + " " + b.Bandwidth
+    return "b=" + b.Type + ":" + b.Bandwidth
 }
 
 func (t *TimeDescription) String() string {
@@ -114,13 +114,18 @@ func (z *Zone) String() string {
 
 func (k *Key) String() string {
     if k.Key != "" {
-        return "k=" + k.Method + " " + k.Key
+        return "k=" + k.Method + ":" + k.Key
     }
     return "k=" + k.Method
 }
 
 func (m *MediaDescription) String() string {
-    s := "m=" + m.Type + " " + strconv.FormatInt(int64(m.Port), 10) + " " + strconv.FormatInt(int64(m.NumPorts), 10) + " " + m.Proto + " " + m.Fmt
+    s := ""
+    if m.NumPorts > 0 {
+        s = "m=" + m.Type + " " + strconv.FormatInt(int64(m.Port), 10) + "/" + strconv.FormatInt(int64(m.NumPorts), 10) + " " + m.Proto + " " + m.Fmt
+    } else {
+        s = "m=" + m.Type + " " + strconv.FormatInt(int64(m.Port), 10) + " " + m.Proto + " " + m.Fmt
+    }
     if m.Info != "" {
         s += "\ni=" + m.Info
     }

@@ -17,6 +17,7 @@ c=IN IP4 224.2.17.12/127
 t=2873397496 2873404696
 r=7d 1h 0 25h
 r=7d 1h 0 25h
+z=2882844526 -1h 2898848070 0
 a=recvonly
 m=audio 49170 RTP/AVP 0
 m=video 51372 RTP/AVP 99
@@ -106,6 +107,18 @@ func TestDecode(t *testing.T) {
     if sd.Times[0].Repeats[1].Offsets[1] != (time.Hour * 25) {
         t.Errorf("Wrong Repeat Offset: %s", sd.Times[0].Repeats[1].Offsets[1])
     }
+    if sd.Times[0].Zones[0].Time.Unix() != 2882844526-ntpUnix {
+        t.Errorf("Wrong Zone Time: %s", sd.Times[0].Zones[0].Time.Unix())
+    }
+    if sd.Times[0].Zones[0].Offset != (time.Hour * -1) {
+        t.Errorf("Wrong Zone Offset: %s", sd.Times[0].Zones[0].Offset)
+    }
+    if sd.Times[0].Zones[1].Time.Unix() != 2898848070-ntpUnix {
+        t.Errorf("Wrong Zone Time: %s", sd.Times[0].Zones[1].Time.Unix())
+    }
+    if sd.Times[0].Zones[1].Offset != 0 {
+        t.Errorf("Wrong Zone Offset: %s", sd.Times[0].Zones[1].Offset)
+    }
     if _,ok := sd.Attributes["recvonly"]; !ok {
         t.Errorf("Attribute recvonly not found")
     }
@@ -141,5 +154,43 @@ func TestDecode(t *testing.T) {
     }
     if sd.MediaDescriptions[1].Attributes["rtpmap"] != "99 h263-1998/90000" {
         t.Errorf("Wrong Media Description Attribute: %s", sd.MediaDescriptions[1].Attributes["rtpmap"])
+    }
+}
+
+var s2 = 
+`v=0
+o=testy 99201111 123 IN IP4 192.168.1.14
+s=SessionName~
+i=A test session
+u=http://example.com
+e=example@web.com (Testy)
+p=123-123-3321 (Testy)
+c=IN IP4 131.134.44.12
+b=CT:128
+k=base64:lol
+m=video 49170/2 RTP/AVP 31
+`
+
+func TestEncode(t *testing.T) {
+    sd := SessionDescription{
+        Version: 0,
+        Origin: Origin{"testy","99201111","123","IN","IP4","192.168.1.14"},
+        SessionName: "SessionName~",
+        Info: "A test session",
+        Uri: "http://example.com",
+        Emails: []Email{Email{"example@web.com","Testy"}},
+        Phones: []Phone{Phone{"123-123-3321","Testy"}},
+        Connection: Connection{"IN","IP4","131.134.44.12"},
+        Bandwidths: []Bandwidth{Bandwidth{"CT","128"}},
+        Key: Key{"base64","lol"},
+        Attributes: make(map[string]string),
+        MediaDescriptions: []MediaDescription{MediaDescription{"video",49170,2,"RTP/AVP","31","",nil,nil,Key{},make(map[string]string)}},
+    }
+    sdp, err := sd.Encode()
+    if err != nil {
+        t.Error(err)
+    }
+    if sdp != s2 {
+        t.Errorf("wrong SDP:\n%s",sdp)
     }
 }

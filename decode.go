@@ -19,13 +19,13 @@ const (
     )
     
 type SDPParser struct {
-    SD SessionDescription
+    SD *SessionDescription
     Rules []func(*SDPParser,string) error
     Index int
 }
 
 
-func Decode(str string) (SessionDescription, error) {
+func Decode(str string) (*SessionDescription, error) {
     sdp := NewSDPParser()
     return sdp.Decode(str)
 }
@@ -33,7 +33,7 @@ func Decode(str string) (SessionDescription, error) {
 var DefaultRules = []func(*SDPParser,string) error{versionLine, originLine, sessionNameLine, infoLine, uriLine, emailLine, phoneLine, connectionLine, timeLine, repeatLine, zoneLine, keyLine, attrLine, mediaLine, mediaInfoLine, mediaConnectionLine, mediaBandwidthLine, mediaAttrLine}
 
 func NewSDPParser() *SDPParser {
-    return &SDPParser{SessionDescription{Attributes: make(map[string]string)},DefaultRules,0}
+    return &SDPParser{NewSessionDescription(),DefaultRules,0}
 }
 
 func (p *SDPParser) Next(s string) error {
@@ -44,7 +44,7 @@ func (p *SDPParser) Next(s string) error {
     return nil
 }
 
-func (p *SDPParser) Decode(str string) (SessionDescription, error) {
+func (p *SDPParser) Decode(str string) (*SessionDescription, error) {
     scanner := bufio.NewScanner(strings.NewReader(str))
     for scanner.Scan() {
         line := scanner.Text()
@@ -569,7 +569,7 @@ func parseAttribute(s string) (string, string, error) {
 
 func parseMedia(s string) (MediaDescription, error) {
     tokens := strings.Split(s," ")
-    m := MediaDescription{Attributes: make(map[string]string)}
+    m := *NewMediaDescription()
     if len(tokens) != 4 {
         return MediaDescription{}, errors.New(badGrammar)
     }

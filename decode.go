@@ -462,21 +462,18 @@ func parseTime(s string) (TimeDescription, error) {
 func parseDuration(s string) (time.Duration, error) {
     var interval time.Duration
     if s[len(s)-1] == 'd' {
-        days, err := strconv.ParseInt(s[0:len(s)-2], 10, 64)
+        days, err := strconv.ParseInt(s[0:len(s)-1], 10, 64)
         if err != nil {
             return time.Nanosecond, err
         }
-        interval, err = time.ParseDuration(strconv.FormatInt(days * 3600, 10)+"h")
+        interval, err = time.ParseDuration(strconv.FormatInt(days * 24, 10)+"h")
         if err != nil {
             return time.Nanosecond, err
         }
     } else if s[len(s)-1] == 'h'  ||
     s[len(s)-1] == 'm'  ||
     s[len(s)-1] == 's'  {
-        interval, err := time.ParseDuration(s)
-        if err != nil {
-            return interval, err
-        }
+        return time.ParseDuration(s)
     } else {
         seconds, err := strconv.ParseInt(s, 10, 64)
         if err != nil {

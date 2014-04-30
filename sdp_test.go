@@ -1,6 +1,7 @@
 package sdp
 
 import (
+    "time"
     "testing"
     )
 
@@ -14,6 +15,8 @@ e=j.doe@example.com (Jane Doe)
 p=Jane Doe<123-456-7890>
 c=IN IP4 224.2.17.12/127
 t=2873397496 2873404696
+r=7d 1h 0 25h
+r=7d 1h 0 25h
 a=recvonly
 m=audio 49170 RTP/AVP 0
 m=video 51372 RTP/AVP 99
@@ -78,6 +81,30 @@ func TestDecode(t *testing.T) {
     }
     if sd.Times[0].Stop.Unix() != 2873404696-ntpUnix {
         t.Errorf("Wrong Phone Name: %s", sd.Times[0].Stop)
+    }
+    if sd.Times[0].Repeats[0].Interval != (time.Hour * 24 * 7) {
+        t.Errorf("Wrong Repeat Interval: %s", sd.Times[0].Repeats[0].Interval)
+    }
+    if sd.Times[0].Repeats[0].Active != time.Hour {
+        t.Errorf("Wrong Repeat Active: %s", sd.Times[0].Repeats[0].Active)
+    }
+    if sd.Times[0].Repeats[0].Offsets[0] != 0 {
+        t.Errorf("Wrong Repeat Offset: %s", sd.Times[0].Repeats[0].Offsets[0])
+    }
+    if sd.Times[0].Repeats[0].Offsets[1] != (time.Hour * 25) {
+        t.Errorf("Wrong Repeat Offset: %s", sd.Times[0].Repeats[0].Offsets[1])
+    }
+    if sd.Times[0].Repeats[1].Interval != (time.Hour * 24 * 7) {
+        t.Errorf("Wrong Repeat Interval: %s", sd.Times[0].Repeats[1].Interval)
+    }
+    if sd.Times[0].Repeats[1].Active != time.Hour {
+        t.Errorf("Wrong Repeat Active: %s", sd.Times[0].Repeats[1].Active)
+    }
+    if sd.Times[0].Repeats[1].Offsets[0] != 0 {
+        t.Errorf("Wrong Repeat Offset: %s", sd.Times[0].Repeats[1].Offsets[0])
+    }
+    if sd.Times[0].Repeats[1].Offsets[1] != (time.Hour * 25) {
+        t.Errorf("Wrong Repeat Offset: %s", sd.Times[0].Repeats[1].Offsets[1])
     }
     if _,ok := sd.Attributes["recvonly"]; !ok {
         t.Errorf("Attribute recvonly not found")

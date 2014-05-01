@@ -363,7 +363,7 @@ func parseEmail(s string) (Email, error) {
             if (bracket1-2) > -1 {
                 return Email{
                     Address: s[(bracket1+1):(bracket2)],
-                    Name: s[0:(bracket1)],
+                    Name: s[0:(bracket1-1)],
                 }, nil
             } else {
                 return Email{}, errors.New(badGrammar)
@@ -392,7 +392,7 @@ func parsePhone(s string) (Phone, error) {
         if (bracket1-2) > -1 {
             return Phone{
                 Address: s[(bracket1+1):(bracket2)],
-                Name: s[0:(bracket1)],
+                Name: s[0:(bracket1-1)],
             }, nil
         } else {
             return Phone{}, errors.New(badGrammar)

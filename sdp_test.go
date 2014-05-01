@@ -12,7 +12,7 @@ s=SDP Seminar
 i=A Seminar on the session description protocol
 u=http://www.example.com/seminars/sdp.pdf
 e=j.doe@example.com (Jane Doe)
-p=Jane Doe<123-456-7890>
+p=Jane Doe <123-456-7890>
 c=IN IP4 224.2.17.12/127
 t=2873397496 2873404696
 r=7d 1h 0 25h
@@ -171,26 +171,39 @@ k=base64:lol
 m=video 49170/2 RTP/AVP 31
 `
 
+var sd = SessionDescription{
+    Version: 0,
+    Origin: Origin{"testy","99201111","123","IN","IP4","192.168.1.14"},
+    SessionName: "SessionName~",
+    Info: "A test session",
+    Uri: "http://example.com",
+    Emails: []Email{Email{"example@web.com","Testy"}},
+    Phones: []Phone{Phone{"123-123-3321","Testy"}},
+    Connection: Connection{"IN","IP4","131.134.44.12"},
+    Bandwidths: []Bandwidth{Bandwidth{"CT","128"}},
+    Key: Key{"base64","lol"},
+    Attributes: make(map[string]string),
+    MediaDescriptions: []MediaDescription{MediaDescription{"video",49170,2,"RTP/AVP","31","",nil,nil,Key{},make(map[string]string)}},
+}
+
 func TestEncode(t *testing.T) {
-    sd := SessionDescription{
-        Version: 0,
-        Origin: Origin{"testy","99201111","123","IN","IP4","192.168.1.14"},
-        SessionName: "SessionName~",
-        Info: "A test session",
-        Uri: "http://example.com",
-        Emails: []Email{Email{"example@web.com","Testy"}},
-        Phones: []Phone{Phone{"123-123-3321","Testy"}},
-        Connection: Connection{"IN","IP4","131.134.44.12"},
-        Bandwidths: []Bandwidth{Bandwidth{"CT","128"}},
-        Key: Key{"base64","lol"},
-        Attributes: make(map[string]string),
-        MediaDescriptions: []MediaDescription{MediaDescription{"video",49170,2,"RTP/AVP","31","",nil,nil,Key{},make(map[string]string)}},
-    }
     sdp, err := sd.Encode()
     if err != nil {
         t.Error(err)
     }
     if sdp != s2 {
         t.Errorf("wrong SDP:\n%s",sdp)
+    }
+}
+
+func BenchmarkDecode(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        _,_ = Decode(s1)
+    }
+}
+
+func BenchmarkEncode(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        _,_ = sd.Encode()
     }
 }

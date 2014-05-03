@@ -119,7 +119,7 @@ func TestDecode(t *testing.T) {
     if sd.Times[0].Zones[1].Offset != 0 {
         t.Errorf("Wrong Zone Offset: %s", sd.Times[0].Zones[1].Offset)
     }
-    if _,ok := sd.Attributes["recvonly"]; !ok {
+    if sd.Attributes[0].Key != "recvonly" {
         t.Errorf("Attribute recvonly not found")
     }
     if sd.MediaDescriptions[0].Type != "audio" {
@@ -152,8 +152,11 @@ func TestDecode(t *testing.T) {
     if sd.MediaDescriptions[1].Fmt != "99" {
         t.Errorf("Wrong Connection Address: %s", sd.MediaDescriptions[1].Fmt)
     }
-    if sd.MediaDescriptions[1].Attributes["rtpmap"] != "99 h263-1998/90000" {
-        t.Errorf("Wrong Media Description Attribute: %s", sd.MediaDescriptions[1].Attributes["rtpmap"])
+    if sd.MediaDescriptions[1].Attributes[0].Key != "rtpmap" {
+        t.Errorf("Wrong Media Description Attribute Key: %s", sd.MediaDescriptions[1].Attributes[0].Key)
+    }
+    if sd.MediaDescriptions[1].Attributes[0].Value != "99 h263-1998/90000" {
+        t.Errorf("Wrong Media Description Attribute Value: %s", sd.MediaDescriptions[1].Attributes[0].Value)
     }
 }
 
@@ -182,8 +185,8 @@ var sd = SessionDescription{
     Connection: Connection{"IN","IP4","131.134.44.12"},
     Bandwidths: []Bandwidth{Bandwidth{"CT","128"}},
     Key: Key{"base64","lol"},
-    Attributes: make(map[string]string),
-    MediaDescriptions: []MediaDescription{MediaDescription{"video",49170,2,"RTP/AVP","31","",nil,nil,Key{},make(map[string]string)}},
+    Attributes: nil,
+    MediaDescriptions: []MediaDescription{MediaDescription{"video",49170,2,"RTP/AVP","31","",nil,nil,Key{},nil}},
 }
 
 func TestEncode(t *testing.T) {

@@ -237,8 +237,8 @@ func keyLine(p *SDPParser,line string) error {
 
 func attrLine(p *SDPParser,line string) error {
     if line[0] == 'a' {
-        if a, b, err := parseAttribute(line[2:]); err == nil {
-            p.SD.Attributes[a] = b
+        if a, err := parseAttribute(line[2:]); err == nil {
+            p.SD.Attributes = append(p.SD.Attributes,a)
         } else {
             return err
         }
@@ -317,8 +317,8 @@ func mediaBandwidthLine(p *SDPParser,line string) error {
 
 func mediaAttrLine(p *SDPParser,line string) error {
     if line[0] == 'a' {
-        if a, b, err := parseAttribute(line[2:]); err == nil {
-            p.SD.MediaDescriptions[(len(p.SD.MediaDescriptions)-1)].Attributes[a] = b
+        if a, err := parseAttribute(line[2:]); err == nil {
+            p.SD.MediaDescriptions[(len(p.SD.MediaDescriptions)-1)].Attributes = append(p.SD.MediaDescriptions[(len(p.SD.MediaDescriptions)-1)].Attributes,a)
         } else {
             return err
         }
@@ -553,17 +553,17 @@ func parseKey(s string) (Key, error) {
     }
 }
 
-func parseAttribute(s string) (string, string, error) {
+func parseAttribute(s string) (Attribute, error) {
     tokens := strings.Split(s,":")
     if !contains(AttrTypes, tokens[0]) {
-        return "", "", errors.New(badGrammar)
+        return Attribute{}, errors.New(badGrammar)
     }
     if len(tokens) == 1 {
-        return tokens[0], "", nil
+        return Attribute{tokens[0], ""}, nil
     } else if len(tokens) == 2 {
-        return tokens[0], tokens[1], nil
+        return Attribute{tokens[0], tokens[1]}, nil
     } else {
-        return "", "", errors.New(badGrammar)
+        return Attribute{}, errors.New(badGrammar)
     }
 }
 

@@ -46,8 +46,8 @@ func (sd *SessionDescription) Encode() (string, error) {
         str += sd.Key.String() + "\n"
     }
     // Addributes
-    for field, value := range sd.Attributes {
-        str += "a=" + field + ":" + value + "\n"
+    for _,attr := range sd.Attributes {
+        str += attr.String() + "\n"
     }
     // Media Descriptions
     for _, md := range sd.MediaDescriptions {
@@ -119,6 +119,13 @@ func (k *Key) String() string {
     return "k=" + k.Method
 }
 
+func (a *Attribute) String() string {
+    if a.Value != "" {
+        return "a=" + a.Key  + ":" + a.Value
+    }
+    return a.Key
+}
+
 func (m *MediaDescription) String() string {
     s := ""
     if m.NumPorts > 0 {
@@ -138,8 +145,8 @@ func (m *MediaDescription) String() string {
     if m.Key.String() != new(Key).String() {
         s += "\n" + m.Key.String()
     }
-    for field, value := range m.Attributes {
-        s += "\na=" + field + ":" + value
+    for _, attr := range m.Attributes {
+        s += "\n" + attr.String()
     }
     return s
 }

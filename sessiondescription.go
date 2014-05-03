@@ -7,7 +7,7 @@ import (
 var (
     MediaTypes = []string{"audio", "video", "text", "application", "message"}
     TransportTypes =  []string{"udp", "RTP/AVP", "RTP/SAVP"}
-    AttrTypes = []string{"cat", "keywds", "tool", "ptime", "maxptime", "rtpmap", "orient", "type", "charset", "framerate", "quality", "fmtp", "recvonly", "sendrecv", "sendonly", "inactive", "sdplang", "lang"}
+    AttrTypes = []string{"cat", "keywds", "tool", "ptime", "maxptime", "rtpmap", "orient", "type", "charset", "framerate", "quality", "fmtp", "recvonly", "sendrecv", "sendonly", "inactive", "sdplang", "lang","ice-pwd","ice-ufrag","candidate"}
     KeyTypes = []string{"prompt", "clear", "base64", "uri"}
     )
 
@@ -23,21 +23,18 @@ type SessionDescription struct {
     Bandwidths        []Bandwidth
     Times             []TimeDescription
     Key               Key
-    Attributes        map[string]string
+    Attributes        []Attribute
     MediaDescriptions []MediaDescription
 }
 
 func NewSessionDescription() *SessionDescription {
     return &SessionDescription{
         Version: 0,
-        Attributes: make(map[string]string),
     }
 }
 
 func NewMediaDescription() *MediaDescription {
-    return &MediaDescription{
-      Attributes: make(map[string]string),
-    }
+    return &MediaDescription{}
 }  
 
 type Origin struct {
@@ -93,6 +90,11 @@ type Key struct {
     Key    string
 }
 
+type Attribute struct {
+    Key   string
+    Value string
+}
+
 type MediaDescription struct {
     Type        string
     Port        int
@@ -103,5 +105,5 @@ type MediaDescription struct {
     Connections []Connection
     Bandwidths  []Bandwidth
     Key         Key
-    Attributes  map[string]string
+    Attributes  []Attribute
 }
